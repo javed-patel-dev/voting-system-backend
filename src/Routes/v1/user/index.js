@@ -9,7 +9,29 @@ const router = Router();
 router.post(
   "/list",
   GlobalRequestValidator(VALIDATORS.GlobalFilterSchema),
-  V1Controller.UsersController.listUsers
+  V1Controller.UsersController.list
+);
+
+router.get(
+  "/:id",
+  V1Controller.UsersController.getById
+);
+
+router.post(
+  "/",
+  GlobalRequestValidator(VALIDATORS.CreateUserSchema),
+  V1Controller.UsersController.create
+);
+
+router.post(
+  "/:id",
+  GlobalRequestValidator(VALIDATORS.UpdateUserSchema),
+  V1Controller.UsersController.update
+);
+
+router.post(
+  "/delete/:id",
+  V1Controller.UsersController.destroy
 );
 
 

@@ -1,14 +1,13 @@
 import * as Yup from "yup";
 
-export const QueriesSchema = Yup.object().shape({
-  query: Yup.string().required("Query is required."),
+export const CreateUserSchema = Yup.object().shape({
+  email: Yup.string().email("Email is invalid.").required("Email is required."),
+  password: Yup.string().min(5, "Password must be at least 5 characters long.").required("Password is required."),
+  name: Yup.string().required("Name is required."),
 });
 
-export const OpenQueriesSchema = Yup.object().shape({
-  email: Yup.string().email("Email is invalid.").required("Email is required."),
-  country_code: Yup.string().required("Country code is required."),
-  phone_number: Yup.string().required("Phone Number is required."),
-  first_name: Yup.string().required("First Name is required."),
-  last_name: Yup.string().required("Last Name is required."),
-  query: Yup.string().required("Query is required."),
+export const UpdateUserSchema = Yup.object().shape({
+  email: Yup.string().email("Email is invalid.").notRequired(),
+  password: Yup.string().min(5, "Password must be at least 5 characters long.").notRequired(),
+  name: Yup.string().notRequired(),
 });
