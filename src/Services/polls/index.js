@@ -38,3 +38,34 @@ export const findAndCountAll = async (
 export const destroy = async (filter) => {
   return Poll.deleteMany(filter); // or deleteOne if single
 };
+
+// Get poll with candidates
+export const getPollWithCandidates = async (pollId) => {
+  return Poll.aggregate([
+    { $match: { _id: new mongoose.Types.ObjectId(pollId) } },
+    {
+      $lookup: {
+        from: "pollcandidates",
+        localField: "_id",
+        foreignField: "pollId",
+        as: "candidates",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "candidates.userId",
+        foreignField: "_id",
+        as: "candidateUsers",
+      },
+    },
+    {
+      $project: {
+        title: 1,
+        startDate: 1,
+        endDate: 1,
+        candidateUsers: { name: 1, email: 1 },
+      },
+    },
+  ]);
+};

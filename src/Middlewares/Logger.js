@@ -12,7 +12,7 @@ winston.addColors({
   debug: "white",
 });
 
-const Logger = winston.createLogger({
+const logger = winston.createLogger({
   level: "debug",
   levels: {
     error: 0,
@@ -33,4 +33,4 @@ const Logger = winston.createLogger({
   },
 });
 
-export { Logger };
+export { logger };

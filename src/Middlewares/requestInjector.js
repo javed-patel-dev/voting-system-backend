@@ -1,8 +1,8 @@
 import moment from 'moment';
-import { uuid } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 
 export const requestInjector = (req, response, next) => {
-  req.requestId = uuid();
+  req.requestId = uuidv4();
   req.requestEpoch = moment().valueOf();
   req.UTCOffset = moment().format('Z');
 

@@ -3,7 +3,7 @@ import * as Yup from "yup";
 
 import { CustomError } from "../utils/CustomError.js";
 
-export const GlobalRequestValidator = (schema) => async (req, res, next) => {
+export const globalRequestValidator = (schema) => async (req, res, next) => {
   try {
     if (!schema || !Yup.isSchema(schema)) return next();
 
@@ -22,7 +22,7 @@ export const GlobalRequestValidator = (schema) => async (req, res, next) => {
         "TOASTER",
         req.requestId,
         req.requestEpoch,
-        error.errors
+        error
       )
     );
   }

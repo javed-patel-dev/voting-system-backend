@@ -8,9 +8,9 @@ export const notFoundHandler = (req, res, next) => {
     new CustomError(
       StatusCodes.NOT_FOUND,
       ReasonPhrases.NOT_FOUND,
-      "TAOSTER_ERROR",
-      get(req, "requestId"),
-      get(req, "requestEpoch")
+      "TOASTER_ERROR",
+      req.requestId,
+      req.requestEpoch
     )
   );
 };

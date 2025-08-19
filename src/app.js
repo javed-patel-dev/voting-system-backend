@@ -14,7 +14,7 @@ import { customResponseInjector } from "./Middlewares/customResponseInjector.js"
 import { globalRateLimiter } from "./Middlewares/globalRateLimiter.js";
 import { disableGlobalHeaders } from "./Middlewares/disableGlobalHeaders.js";
 import { hostNameValidator } from "./Middlewares/hostNameValidator.js";
-import { Logger } from "./Middlewares/Logger.js";
+import { logger } from "./Middlewares/Logger.js";
 import { errorHandler } from "./Middlewares/errorHandler.js";
 import { notFoundHandler } from "./Middlewares/notFoundHandler.js";
 import { requestInjector } from "./Middlewares/requestInjector.js";
@@ -62,17 +62,17 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  Logger.info(`STARTING SERVER ON PORT - ${PORT} ENVIRONMENT - ${NODE_ENV}`, {
+  logger.info(`STARTING SERVER ON PORT - ${PORT} ENVIRONMENT - ${NODE_ENV}`, {
     component: "EXPRESS",
   });
 });
 
 process.on("unhandledRejection", (error) => {
-  Logger.error(`UNHANDLED REJECTION`, { component: "EXPRESS", error });
+  logger.error(`UNHANDLED REJECTION`, { component: "EXPRESS", error });
   process.exit(1);
 });
 
 process.on("uncaughtException", (error) => {
-  Logger.error(`UNCAUGHT EXCEPTION`, { component: "EXPRESS", error });
+  logger.error(`UNCAUGHT EXCEPTION`, { component: "EXPRESS", error });
   process.exit(1);
 });

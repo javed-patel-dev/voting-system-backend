@@ -2,13 +2,10 @@ import mongoose from "mongoose";
 
 const pollSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
-    description: String,
-
+    title: { type: String, unique: true, required: true },
+    description: { type: String, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-
-    candidates: [{ type: mongoose.Schema.Types.ObjectId, ref: "Candidates" }], // populated later
   },
   {
     timestamps: true, // adds createdAt, updatedAt
@@ -19,4 +16,4 @@ const pollSchema = new mongoose.Schema(
 // Index for startDate/endDate queries
 pollSchema.index({ startDate: 1, endDate: 1 });
 
-export const Poll = mongoose.model("Polls", pollSchema);
+export const Poll = mongoose.model("polls", pollSchema);

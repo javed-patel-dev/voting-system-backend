@@ -7,7 +7,6 @@ export const CreateUserSchema = Yup.object().shape({
 });
 
 export const UpdateUserSchema = Yup.object().shape({
-  email: Yup.string().email("Email is invalid.").notRequired(),
   password: Yup.string().min(5, "Password must be at least 5 characters long.").notRequired(),
   name: Yup.string().notRequired(),
 });

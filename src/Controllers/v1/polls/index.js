@@ -1,4 +1,4 @@
-import { UserService } from "../../../services/index.js";
+import { PollService } from "../../../services/index.js";
 import { CustomError } from "../../../utils/CustomError.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { get } from "lodash-es";
@@ -8,20 +8,22 @@ export const list = async (req, res, next) => {
     const { body } = req;
     const { filter, sort, page, limit, projection } = body;
 
-    const { data, total } = await UserService.findAndCountAll(
+    const { data, total } = await PollService.findAndCountAll(
       {
         ...(get(filter, "search") && {
           $or: [
             { _id: { $regex: get(filter, "search"), $options: "i" } },
-            { name: { $regex: get(filter, "search"), $options: "i" } },
-            { email: { $regex: get(filter, "search"), $options: "i" } },
+            { title: { $regex: get(filter, "search"), $options: "i" } },
+            { description: { $regex: get(filter, "search"), $options: "i" } },
+            { startDate: { $regex: get(filter, "search"), $options: "i" } },
+            { endDate: { $regex: get(filter, "search"), $options: "i" } },
           ],
         }),
-        ...(get(filter, "email") && {
-          email: { $regex: get(filter, "email"), $options: "i" },
+        ...(get(filter, "title") && {
+          title: { $regex: get(filter, "title"), $options: "i" },
         }),
-        ...(get(filter, "role") && {
-          role: get(filter, "role"),
+        ...(get(filter, "description") && {
+          description: { $regex: get(filter, "description"), $options: "i" },
         }),
         ...(get(filter, "id") && {
           _id: { $regex: get(filter, "id"), $options: "i" },
@@ -59,7 +61,7 @@ export const getDetailById = async (req, res, next) => {
       params: { id },
     } = req;
 
-    const data = await UserService.findOne({ _id: id });
+    const data = await PollService.getPollWithCandidates(id);
 
     return res.customResponse(
       StatusCodes.OK,
@@ -85,7 +87,7 @@ export const create = async (req, res, next) => {
   try {
     const { body } = req;
 
-    const data = await UserService.create(body);
+    const data = await PollService.create(body);
 
     return res.customResponse(
       StatusCodes.CREATED,
@@ -99,7 +101,7 @@ export const create = async (req, res, next) => {
       return next(
         new CustomError(
           StatusCodes.CONFLICT,
-          "Email already exists",
+          "title already exists",
           "TOASTER",
           req.requestId,
           req.requestEpoch
@@ -126,7 +128,7 @@ export const update = async (req, res, next) => {
       body,
     } = req;
 
-    await UserService.updateOne({ _id: id }, body);
+    await PollService.updateOne({ _id: id }, body);
 
     return res.customResponse(
       StatusCodes.OK,
@@ -154,7 +156,7 @@ export const destroy = async (req, res, next) => {
       params: { id },
     } = req;
 
-    await UserService.destroy({ _id: id });
+    await PollService.destroy({ _id: id });
 
     return res.customResponse(
       StatusCodes.OK,

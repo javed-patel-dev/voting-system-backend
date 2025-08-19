@@ -1,0 +1,26 @@
+import { Router } from "express";
+
+import { globalRequestValidator } from "../../../Middlewares/globalRequestValidator.js";
+import { VALIDATORS } from "../../../validations/index.js";
+import { V1Controller } from "../../../Controllers/index.js";
+import { authGuard } from "../../../Middlewares/authGuard.js";
+import { routeGuard } from "../../../Middlewares/routeGuard.js";
+
+const router = Router();
+
+router.post(
+  "/",
+  globalRequestValidator(VALIDATORS.CreateUserSchema),
+  authGuard(),
+  routeGuard("CANDIDATE"),
+  V1Controller.PollCandidatesController.create
+);
+
+router.post(
+  "/delete/:id",
+  authGuard(),
+  routeGuard("CANDIDATE"),
+  V1Controller.PollCandidatesController.destroy
+);
+
+export default router;
