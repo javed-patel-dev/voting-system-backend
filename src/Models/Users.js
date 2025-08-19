@@ -8,8 +8,8 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: ["voter", "candidate", "admin"], // by default voter
-      default: "voter",
+      enum: ["VOTER", "CANDIDATE", "ADMIN"], // by default voter
+      default: "VOTER",
     },
   },
   {

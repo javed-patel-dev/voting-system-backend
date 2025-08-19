@@ -5,7 +5,6 @@ export const CreatePollSchema = Yup.object().shape({
   description: Yup.string().required("Description is required."),
   startDate: Yup.date().required("Start date is required."),
   endDate: Yup.date().required("End date is required."),
-  candidates: Yup.array().of(Yup.string().required("Candidate ID is required.")),
 });
 
 export const UpdatePollSchema = Yup.object().shape({

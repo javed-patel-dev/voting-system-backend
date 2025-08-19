@@ -1,9 +1,15 @@
-import { ReasonPhrases } from "http-status-codes";
+import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { JWTInstance } from "../utils/JWT.js";
+import { CustomError } from "../utils/customError.js";
+import { get, set } from "lodash-es";
 
 export const authGuard = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ");
+    const { headers: { authorization } } = req;
+
+    if (!authorization) throw Error(ReasonPhrases.UNAUTHORIZED);
+    
+    const token = authorization.split(" ");
 
     if (token && token[0] === "Bearer" && token[1]) {
       const decryptedPayload = JWTInstance.verifyToken(

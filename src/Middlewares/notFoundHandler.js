@@ -1,7 +1,7 @@
 import { StatusCodes, ReasonPhrases } from "http-status-codes";
 import { get } from "lodash-es";
 
-import { CustomError } from "../utils/CustomError.js";
+import { CustomError } from "../utils/customError.js";
 
 export const notFoundHandler = (req, res, next) => {
   return next(

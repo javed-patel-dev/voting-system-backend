@@ -1,16 +1,26 @@
-import { PollCandidateService } from "../../../services/index.js";
-import { CustomError } from "../../../utils/CustomError.js";
+import { CandidateService, UserService } from "../../../services/index.js";
+import { CustomError } from "../../../utils/customError.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
+import { get } from "lodash-es";
 
 export const create = async (req, res, next) => {
   try {
-    const { body } = req;
+    const { body, decodedUser } = req;
 
-    const data = await PollCandidateService.create(body);
+    await Promise.all([
+      CandidateService.create({
+        ...body,
+        userId: get(decodedUser, "id"),
+      }),
+      UserService.updateOne(
+        { _id: get(decodedUser, "id") },
+        { role: "CANDIDATE" }
+      ),
+    ]);
 
     return res.customResponse(
       StatusCodes.CREATED,
-      data,
+      ReasonPhrases.CREATED,
       true,
       req.requestId,
       req.requestEpoch
@@ -20,7 +30,7 @@ export const create = async (req, res, next) => {
       return next(
         new CustomError(
           StatusCodes.CONFLICT,
-          "title already exists",
+          "Candidate already registered to poll",
           "TOASTER",
           req.requestId,
           req.requestEpoch
@@ -46,7 +56,7 @@ export const destroy = async (req, res, next) => {
       params: { id },
     } = req;
 
-    await PollCandidateService.destroy({ _id: id });
+    await CandidateService.destroy({ _id: id });
 
     return res.customResponse(
       StatusCodes.OK,

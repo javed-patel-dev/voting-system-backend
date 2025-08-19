@@ -9,16 +9,16 @@ import { routeGuard } from "../../../Middlewares/routeGuard.js";
 const router = Router();
 
 router.post(
-  "/",
-  globalRequestValidator(VALIDATORS.CreateUserSchema),
-  authGuard(),
-  routeGuard("CANDIDATE"),
+  "/register",
+  globalRequestValidator(VALIDATORS.CreateCandidateSchema),
+  authGuard,
+  routeGuard("VOTER"),
   V1Controller.PollCandidatesController.create
 );
 
 router.post(
   "/delete/:id",
-  authGuard(),
+  authGuard,
   routeGuard("CANDIDATE"),
   V1Controller.PollCandidatesController.destroy
 );

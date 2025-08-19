@@ -1,5 +1,5 @@
 import { PollService } from "../../../services/index.js";
-import { CustomError } from "../../../utils/CustomError.js";
+import { CustomError } from "../../../utils/customError.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { get } from "lodash-es";
 

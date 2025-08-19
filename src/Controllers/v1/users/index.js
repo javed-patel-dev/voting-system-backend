@@ -1,7 +1,8 @@
 import { UserService } from "../../../services/index.js";
-import { CustomError } from "../../../utils/CustomError.js";
+import { CustomError } from "../../../utils/customError.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { get } from "lodash-es";
+import { encrypt } from "../../../utils/encrypt.js";
 
 export const list = async (req, res, next) => {
   try {
@@ -53,38 +54,11 @@ export const list = async (req, res, next) => {
   }
 };
 
-export const getDetailById = async (req, res, next) => {
-  try {
-    const {
-      params: { id },
-    } = req;
-
-    const data = await UserService.findOne({ _id: id });
-
-    return res.customResponse(
-      StatusCodes.OK,
-      data,
-      true,
-      req.requestId,
-      req.requestEpoch
-    );
-  } catch (error) {
-    return next(
-      new CustomError(
-        StatusCodes.INTERNAL_SERVER_ERROR,
-        error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
-        "TOASTER",
-        req.requestId,
-        req.requestEpoch
-      )
-    );
-  }
-};
-
 export const create = async (req, res, next) => {
   try {
     const { body } = req;
 
+    body.password = await encrypt.hash(get(body, "password", ""));
     const data = await UserService.create(body);
 
     return res.customResponse(

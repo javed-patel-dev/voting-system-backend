@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 const candidateSchema = new mongoose.Schema(
   {
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
       required: true,
     },
-    poll: {
+    pollId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "polls",
       required: true,
@@ -20,6 +20,6 @@ const candidateSchema = new mongoose.Schema(
 );
 
 // Enforce 1 candidate per poll per user
-candidateSchema.index({ user: 1, poll: 1 }, { unique: true });
+candidateSchema.index({ userId: 1, pollId: 1 }, { unique: true });
 
 export const Candidate = mongoose.model("candidates", candidateSchema);

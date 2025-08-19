@@ -10,14 +10,12 @@ const router = Router();
 router.post(
   "/list",
   globalRequestValidator(VALIDATORS.GlobalFilterSchema),
-  authGuard(),
+  authGuard,
   V1Controller.UsersController.list
 );
 
-router.get("/:id", authGuard(), V1Controller.UsersController.getDetailById);
-
 router.post(
-  "/",
+  "/register",
   globalRequestValidator(VALIDATORS.CreateUserSchema),
   V1Controller.UsersController.create
 );
@@ -25,10 +23,10 @@ router.post(
 router.post(
   "/:id",
   globalRequestValidator(VALIDATORS.UpdateUserSchema),
-  authGuard(),
+  authGuard,
   V1Controller.UsersController.update
 );
 
-router.post("/delete/:id", authGuard(), V1Controller.UsersController.destroy);
+router.post("/delete/:id", authGuard, V1Controller.UsersController.destroy);
 
 export default router;

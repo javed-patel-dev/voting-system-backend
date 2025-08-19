@@ -1,4 +1,5 @@
 // services/PollService.js
+import mongoose from "mongoose";
 import { Poll } from "../../Models/Polls.js";
 
 // Find one document
@@ -26,12 +27,12 @@ export const findAndCountAll = async (
 ) => {
   const skip = (page - 1) * limit;
 
-  const [results, total] = await Promise.all([
+  const [data, total] = await Promise.all([
     Poll.find(filter, projection).sort(sort).skip(skip).limit(limit),
     Poll.countDocuments(filter),
   ]);
 
-  return { results, total };
+  return { data, total };
 };
 
 // Delete (destroy)
@@ -45,7 +46,7 @@ export const getPollWithCandidates = async (pollId) => {
     { $match: { _id: new mongoose.Types.ObjectId(pollId) } },
     {
       $lookup: {
-        from: "pollcandidates",
+        from: "candidates",
         localField: "_id",
         foreignField: "pollId",
         as: "candidates",
@@ -64,7 +65,13 @@ export const getPollWithCandidates = async (pollId) => {
         title: 1,
         startDate: 1,
         endDate: 1,
-        candidateUsers: { name: 1, email: 1 },
+        candidateUsers: {
+          $map: {
+            input: "$candidateUsers",
+            as: "u",
+            in: { name: "$$u.name", email: "$$u.email" },
+          },
+        },
       },
     },
   ]);

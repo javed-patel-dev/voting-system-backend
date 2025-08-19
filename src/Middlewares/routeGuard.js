@@ -1,10 +1,14 @@
-import { ReasonPhrases } from "http-status-codes";
+import { ReasonPhrases, StatusCodes } from "http-status-codes";
+import { CustomError } from "../utils/customError.js";
 
-export const routeGuard = (userRole) => async (req, res, next) => {
+export const routeGuard = (allowedRoles) => async (req, res, next) => {
   try {
     const { decodedUser } = req;
 
-    if (decodedUser.role !== userRole) {
+    // Ensure allowedRoles is always an array
+    const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+
+    if (!rolesArray.includes(decodedUser.role)) {
       throw new Error(ReasonPhrases.FORBIDDEN);
     }
 
