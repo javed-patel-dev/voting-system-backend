@@ -21,10 +21,10 @@ class Mailer {
       hbs({
         viewEngine: {
           extname: ".hbs",
-          layoutsDir: path.resolve("./templates/email/"),
+          layoutsDir: path.resolve("src/templates/email/"),
           defaultLayout: false,
         },
-        viewPath: path.resolve("./templates/email/"),
+        viewPath: path.resolve("src/templates/email/"),
         extName: ".hbs",
       })
     );

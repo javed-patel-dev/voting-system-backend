@@ -9,30 +9,18 @@ import { routeGuard } from "../../../Middlewares/routeGuard.js";
 const router = Router();
 
 router.post(
-  "/list",
-  globalRequestValidator(VALIDATORS.GlobalFilterSchema),
+  "/cast",
+  globalRequestValidator(VALIDATORS.CreateVoteSchema),
   authGuard,
-  V1Controller.UsersController.list
-);
-
-router.post(
-  "/register",
-  globalRequestValidator(VALIDATORS.CreateUserSchema),
-  V1Controller.UsersController.create
-);
-
-router.post(
-  "/:id",
-  globalRequestValidator(VALIDATORS.UpdateUserSchema),
-  authGuard,
-  V1Controller.UsersController.update
+  routeGuard("VOTER"),
+  V1Controller.VotesController.create
 );
 
 router.post(
   "/delete/:id",
   authGuard,
-  routeGuard("ADMIN"),
-  V1Controller.UsersController.destroy
+  routeGuard("VOTER"),
+  V1Controller.VotesController.destroy
 );
 
 export default router;

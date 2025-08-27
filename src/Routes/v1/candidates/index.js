@@ -17,6 +17,14 @@ router.post(
 );
 
 router.post(
+  "/list",
+  globalRequestValidator(VALIDATORS.GlobalFilterSchema),
+  authGuard,
+  routeGuard(["VOTER", "CANDIDATE", "ADMIN"]),
+  V1Controller.PollCandidatesController.list
+);
+
+router.post(
   "/delete/:id",
   authGuard,
   routeGuard("CANDIDATE"),

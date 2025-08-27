@@ -7,12 +7,12 @@ const voteSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
-    candidate: {
+    candidateId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "candidates",
       required: true,
     },
-    poll: {
+    pollId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "polls",
       required: true,
@@ -25,6 +25,6 @@ const voteSchema = new mongoose.Schema(
 );
 
 // Enforce: a voter can only vote once per poll
-voteSchema.index({ voter: 1, poll: 1 }, { unique: true });
+voteSchema.index({ voter: 1, pollId: 1 }, { unique: true });
 
 export const Vote = mongoose.model("votes", voteSchema);
