@@ -12,5 +12,23 @@ router.post(
   V1Controller.AuthController.login
 );
 
+router.post(
+  "/registration/otp",
+  globalRequestValidator(VALIDATORS.RegistrationOTPSchema),
+  V1Controller.AuthController.sendRegistrationEmail
+);
+
+router.post(
+  "/resend/otp",
+  globalRequestValidator(VALIDATORS.ResendOTPSchema),
+  V1Controller.AuthController.resendOTP
+);
+
+router.post(
+  "/reset/password",
+  globalRequestValidator(VALIDATORS.resetPasswordSchema),
+  V1Controller.AuthController.resetPassword
+);
+
 
 export default router;

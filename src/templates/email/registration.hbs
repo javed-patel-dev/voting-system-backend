@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Email Verification - Voting App</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f7f8fa;
+        margin: 0;
+        padding: 0;
+        color: #333333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+      }
+      h1 {
+        font-size: 22px;
+        color: #222222;
+        margin-bottom: 16px;
+      }
+      p {
+        font-size: 15px;
+        margin: 8px 0;
+        color: #555555;
+      }
+      .otp-box {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f3f6ff;
+        border: 1px solid #d9e2ff;
+        font-size: 28px;
+        font-weight: bold;
+        text-align: center;
+        color: #2c3e50;
+        letter-spacing: 4px;
+        border-radius: 8px;
+      }
+      .footer {
+        font-size: 13px;
+        color: #888888;
+        margin-top: 25px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Email Verification</h1>
+
+      <p>Hello {{email}},</p>
+      <p>
+        Use the following One Time Password (OTP) to verify your email address.
+        This code will expire in <strong>5 minutes</strong>.
+      </p>
+
+      <div class="otp-box">{{otp}}</div>
+
+      <p>If you didn’t request this, you can safely ignore this email.</p>
+
+      <div class="footer">
+        <p>© {{year}} Voting System. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

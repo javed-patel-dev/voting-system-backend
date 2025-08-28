@@ -3,6 +3,7 @@ import { CustomError } from "../../../utils/customError.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { get } from "lodash-es";
 import { encrypt } from "../../../utils/encrypt.js";
+import { verifyOtp } from "../../../services/otp/index.js";
 
 export const list = async (req, res, next) => {
   try {
@@ -59,19 +60,36 @@ export const create = async (req, res, next) => {
   try {
     const { body } = req;
 
+    const { success, message } = await verifyOtp(
+      get(body, "email"),
+      "REGISTER",
+      get(body, "otp")
+    );
+
+    if (!success) {
+      return next(
+        new CustomError(
+          StatusCodes.UNAUTHORIZED,
+          message || "Invalid OTP",
+          "TOASTER",
+          req.requestId,
+          req.requestEpoch
+        )
+      );
+    }
+
     body.password = await encrypt.hash(get(body, "password", ""));
-    const data = await UserService.create(body);
+    await UserService.create(body);
 
     return res.customResponse(
       StatusCodes.CREATED,
-      data,
+      "User created successfully",
       true,
       req.requestId,
       req.requestEpoch
     );
   } catch (error) {
     if (error.code === 11000) {
-      console.log('are we here', error)
       return next(
         new CustomError(
           StatusCodes.CONFLICT,
