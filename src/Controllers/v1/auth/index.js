@@ -16,7 +16,7 @@ export const login = async (req, res, next) => {
       return next(
         new CustomError(
           StatusCodes.UNAUTHORIZED,
-          "Invalid email",
+          "Email not registered with us",
           "TOASTER",
           req.requestId,
           req.requestEpoch
@@ -54,7 +54,8 @@ export const login = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }

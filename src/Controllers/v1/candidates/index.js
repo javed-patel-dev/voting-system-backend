@@ -38,7 +38,8 @@ export const list = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }
@@ -74,7 +75,8 @@ export const create = async (req, res, next) => {
           "Candidate already registered to poll",
           "TOASTER",
           req.requestId,
-          req.requestEpoch
+          req.requestEpoch,
+          error
         )
       );
     }
@@ -85,7 +87,8 @@ export const create = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }
@@ -113,7 +116,8 @@ export const destroy = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }

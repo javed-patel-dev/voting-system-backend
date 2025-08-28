@@ -49,7 +49,8 @@ export const list = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }
@@ -77,7 +78,8 @@ export const getDetailById = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }
@@ -104,7 +106,8 @@ export const create = async (req, res, next) => {
           "title already exists",
           "TOASTER",
           req.requestId,
-          req.requestEpoch
+          req.requestEpoch,
+          error
         )
       );
     }
@@ -115,7 +118,8 @@ export const create = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }
@@ -144,7 +148,8 @@ export const update = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }
@@ -172,7 +177,8 @@ export const destroy = async (req, res, next) => {
         error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
         "TOASTER",
         req.requestId,
-        req.requestEpoch
+        req.requestEpoch,
+        error
       )
     );
   }

@@ -1,8 +1,6 @@
 import { StatusCodes, ReasonPhrases } from "http-status-codes";
-import { get } from "lodash-es";
 
 import { CustomError } from "../utils/customError.js";
-
 export const notFoundHandler = (req, res, next) => {
   return next(
     new CustomError(
@@ -10,7 +8,8 @@ export const notFoundHandler = (req, res, next) => {
       ReasonPhrases.NOT_FOUND,
       "TOASTER_ERROR",
       req.requestId,
-      req.requestEpoch
+      req.requestEpoch,
+      "The requested resource was not found"
     )
   );
 };
