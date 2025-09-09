@@ -60,7 +60,7 @@ export const create = async (req, res, next) => {
   try {
     const { body } = req;
 
-    const { success, message } = await verifyOtp(
+    const { success } = await verifyOtp(
       get(body, "email"),
       "REGISTER",
       get(body, "otp")
@@ -70,7 +70,7 @@ export const create = async (req, res, next) => {
       return next(
         new CustomError(
           StatusCodes.UNAUTHORIZED,
-          message || "Invalid OTP",
+          "Session expired to create user. Please verify OTP again.",
           "TOASTER",
           req.requestId,
           req.requestEpoch

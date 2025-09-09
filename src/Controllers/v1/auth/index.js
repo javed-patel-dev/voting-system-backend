@@ -84,7 +84,6 @@ export const sendRegistrationEmail = async (req, res, next) => {
 
     const emailExist = await UserService.findOne({ email });
     if (emailExist) {
-      console.log("are we here ");
       return next(
         new CustomError(
           StatusCodes.CONFLICT,
@@ -102,6 +101,59 @@ export const sendRegistrationEmail = async (req, res, next) => {
       to: email,
       subject: "Email Verification - Online Voting System",
       template: getEmailTemplateName("REGISTER"),
+      context: {
+        email,
+        otp,
+        year: new Date().getFullYear(),
+      },
+    });
+
+    return res.customResponse(
+      StatusCodes.CREATED,
+      "OTP sent successfully",
+      true,
+      req.requestId,
+      req.requestEpoch
+    );
+  } catch (error) {
+    if (error.code === 11000) {
+      return next(
+        new CustomError(
+          StatusCodes.CONFLICT,
+          "OTP already exists",
+          "TOASTER",
+          req.requestId,
+          req.requestEpoch,
+          error
+        )
+      );
+    }
+
+    return next(
+      new CustomError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
+        "TOASTER",
+        req.requestId,
+        req.requestEpoch,
+        error
+      )
+    );
+  }
+};
+
+export const sendResetPasswordEmail = async (req, res, next) => {
+  try {
+    const {
+      body: { email },
+    } = req;
+
+    const { otp } = await OTPService.createOtp(email, "PASSWORD_RESET");
+
+    mailer.sendMail({
+      to: email,
+      subject: "Email Verification - Online Voting System",
+      template: getEmailTemplateName("PASSWORD_RESET"),
       context: {
         email,
         otp,
@@ -226,6 +278,47 @@ export const resendOTP = async (req, res, next) => {
     return res.customResponse(
       StatusCodes.OK,
       "OTP resent successfully",
+      true,
+      req.requestId,
+      req.requestEpoch
+    );
+  } catch (error) {
+    return next(
+      new CustomError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
+        "TOASTER",
+        req.requestId,
+        req.requestEpoch,
+        error
+      )
+    );
+  }
+};
+
+export const verifyOtpApi = async (req, res, next) => {
+  try {
+    const {
+      body: { email, purpose, otp },
+    } = req;
+
+    const { success, message } = await verifyOtp(email, purpose, otp);
+
+    if (!success) {
+      return next(
+        new CustomError(
+          StatusCodes.UNAUTHORIZED,
+          message || "Invalid OTP",
+          "TOASTER",
+          req.requestId,
+          req.requestEpoch
+        )
+      );
+    }
+
+    return res.customResponse(
+      StatusCodes.OK,
+      "OTP verified successfully",
       true,
       req.requestId,
       req.requestEpoch

@@ -35,8 +35,5 @@ export const verifyOtp = async (email, purpose, submittedOtp) => {
   if (!otpDoc) return { success: false, message: "OTP expired or not found" };
   if (otpDoc.otp !== submittedOtp) return { success: false, message: "Invalid OTP" };
 
-  // OTP is valid → delete it so it can't be reused
-  await OTP.deleteOne({ _id: otpDoc._id });
-
   return { success: true, message: "OTP verified successfully" };
 };

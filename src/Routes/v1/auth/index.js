@@ -19,6 +19,12 @@ router.post(
 );
 
 router.post(
+  "/password/reset/otp",
+  globalRequestValidator(VALIDATORS.ResetPasswordOTPSchema),
+  V1Controller.AuthController.sendResetPasswordEmail
+);
+
+router.post(
   "/resend/otp",
   globalRequestValidator(VALIDATORS.ResendOTPSchema),
   V1Controller.AuthController.resendOTP
@@ -26,9 +32,14 @@ router.post(
 
 router.post(
   "/reset/password",
-  globalRequestValidator(VALIDATORS.resetPasswordSchema),
+  globalRequestValidator(VALIDATORS.ResetPasswordSchema),
   V1Controller.AuthController.resetPassword
 );
 
+router.post(
+  "/otp/verify",
+  globalRequestValidator(VALIDATORS.VerifyOTPSchema),
+  V1Controller.AuthController.verifyOtpApi
+);
 
 export default router;
