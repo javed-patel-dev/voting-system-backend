@@ -9,7 +9,7 @@ export const routeGuard = (allowedRoles) => async (req, res, next) => {
     const rolesArray = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
     if (!rolesArray.includes(decodedUser.role)) {
-      throw new Error(ReasonPhrases.FORBIDDEN);
+      throw new Error("User does not have the required role to access this resource");
     }
 
     return next();

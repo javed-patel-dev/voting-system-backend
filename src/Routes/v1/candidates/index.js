@@ -13,22 +13,20 @@ router.post(
   globalRequestValidator(VALIDATORS.CreateCandidateSchema),
   authGuard,
   routeGuard("VOTER"),
-  V1Controller.PollCandidatesController.create
+  V1Controller.CandidatesController.create
 );
 
 router.post(
   "/list",
   globalRequestValidator(VALIDATORS.GlobalFilterSchema),
-  authGuard,
-  routeGuard(["VOTER", "CANDIDATE", "ADMIN"]),
-  V1Controller.PollCandidatesController.list
+  V1Controller.CandidatesController.list
 );
 
 router.post(
   "/delete/:id",
   authGuard,
   routeGuard("CANDIDATE"),
-  V1Controller.PollCandidatesController.destroy
+  V1Controller.CandidatesController.destroy
 );
 
 export default router;

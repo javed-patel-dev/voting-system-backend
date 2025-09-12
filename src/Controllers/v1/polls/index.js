@@ -103,7 +103,7 @@ export const create = async (req, res, next) => {
       return next(
         new CustomError(
           StatusCodes.CONFLICT,
-          "title already exists",
+          "Poll with this title already exists",
           "TOASTER",
           req.requestId,
           req.requestEpoch,

@@ -6,6 +6,11 @@ export const create = async (data) => {
   return Candidate.create(data);
 };
 
+// findOne
+export const findOne = async (filter) => {
+  return Candidate.findOne(filter);
+};
+
 // Find and count all (pagination + sorting)
 export const findAndCountAll = async (
   filter = {},
@@ -17,7 +22,7 @@ export const findAndCountAll = async (
   const skip = (page - 1) * limit;
 
   const [data, total] = await Promise.all([
-    Candidate.find(filter, projection).sort(sort).skip(skip).limit(limit),
+    Candidate.find(filter, projection).populate("userId").populate("pollId").sort(sort).skip(skip).limit(limit),
     Candidate.countDocuments(filter),
   ]);
 

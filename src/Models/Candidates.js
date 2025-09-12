@@ -19,7 +19,7 @@ const candidateSchema = new mongoose.Schema(
   }
 );
 
-// Enforce 1 candidate per poll per user
-candidateSchema.index({ userId: 1, pollId: 1 }, { unique: true });
+// Enforce 1 candidate per poll
+candidateSchema.index({ userId: 1 }, { unique: true });
 
 export const Candidate = mongoose.model("candidates", candidateSchema);

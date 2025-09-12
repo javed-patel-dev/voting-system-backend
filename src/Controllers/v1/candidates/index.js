@@ -72,7 +72,7 @@ export const create = async (req, res, next) => {
       return next(
         new CustomError(
           StatusCodes.CONFLICT,
-          "Candidate already registered to poll",
+          "You've already registered to this poll",
           "TOASTER",
           req.requestId,
           req.requestEpoch,

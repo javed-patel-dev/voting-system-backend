@@ -1,5 +1,5 @@
 import moment from "moment";
-import { VoteService, PollService } from "../../../services/index.js";
+import { VoteService, PollService, CandidateService } from "../../../services/index.js";
 import { CustomError } from "../../../utils/customError.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { get } from "lodash-es";
@@ -8,12 +8,15 @@ export const create = async (req, res, next) => {
   try {
     const { body, decodedUser } = req;
 
-    const poll = await PollService.findOne({ _id: get(body, "pollId") });
+    const [poll, candidate] = await Promise.all([
+      PollService.findOne({ _id: get(body, "pollId") }),
+      CandidateService.findOne({ userId: get(decodedUser, "id"), pollId: get(body, "pollId") }),
+    ]);
 
-    if (!poll) {
+    if (!poll || candidate) {
       return res.customResponse(
         StatusCodes.NOT_FOUND,
-        "Poll not found",
+        "Poll not found or user is not a candidate in this poll",
         false,
         req.requestId,
         req.requestEpoch
@@ -59,7 +62,7 @@ export const create = async (req, res, next) => {
       return next(
         new CustomError(
           StatusCodes.CONFLICT,
-          "Voter already caste his vote",
+          "You've already cast your vote for this poll",
           "TOASTER",
           req.requestId,
           req.requestEpoch,
