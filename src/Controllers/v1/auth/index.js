@@ -41,7 +41,7 @@ export const login = async (req, res, next) => {
       );
     }
 
-    const token = await JWTInstance.generateToken({ id: user._id, email: user.email, role: user.role });
+    const token = await JWTInstance.generateToken({ id: user._id, email: user.email, name: user.name, role: user.role });
 
     return res.customResponse(
       StatusCodes.OK,
