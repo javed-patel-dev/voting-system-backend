@@ -62,7 +62,7 @@ export const getDetailById = async (req, res, next) => {
       params: { id },
     } = req;
 
-    const data = await PollService.getPollWithCandidates(id);
+    const data = await PollService.getById(id);
 
     return res.customResponse(
       StatusCodes.OK,

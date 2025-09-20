@@ -1,4 +1,4 @@
-import { VoteService } from "../../../services/index.js";
+import { AnalyticService } from "../../../services/index.js";
 import { CustomError } from "../../../utils/customError.js";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import { get } from "lodash-es";
@@ -7,7 +7,7 @@ export const listPollsWithCandidateDetails = async (req, res, next) => {
   try {
     const { body } = req;
 
-    const { count, data } = await VoteService.listPollWithCandidate(
+    const { count, data } = await AnalyticService.listPollWithCandidate(
       get(body, "filter", {}),
       get(body, "sort", { voteCount: -1 }),
       get(body, "page", 1),
@@ -42,7 +42,7 @@ export const listCandidateWithVoterDetails = async (req, res, next) => {
   try {
     const { body } = req;
 
-    const { count, data } = await VoteService.listCandidatesWithVoters(
+    const { count, data } = await AnalyticService.listCandidatesWithVoters(
       get(body, "filter", {}),
       get(body, "sort", { createdAt: -1 }),
       get(body, "page", 1),

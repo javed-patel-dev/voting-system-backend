@@ -17,7 +17,7 @@ router.post(
 router.get(
   "/:id",
   authGuard,
-  routeGuard(["VOTER", "ADMIN"]),
+  routeGuard(["VOTER", "ADMIN", "CANDIDATE"]),
   V1Controller.PollsController.getDetailById
 );
 

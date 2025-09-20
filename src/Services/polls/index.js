@@ -40,6 +40,10 @@ export const destroy = async (filter) => {
   return Poll.deleteMany(filter); // or deleteOne if single
 };
 
+export const getById = async (id) => {
+  return Poll.findById(id);
+}
+
 // Get poll with candidates
 export const getPollWithCandidates = async (pollId) => {
   return Poll.aggregate([
