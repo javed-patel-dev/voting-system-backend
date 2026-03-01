@@ -8,6 +8,13 @@ import { routeGuard } from "../../../Middlewares/routeGuard.js";
 
 const router = Router();
 
+router.get(
+  "/dashboard-stats",
+  authGuard,
+  routeGuard("ADMIN"),
+  V1Controller.AnalyticsController.getDashboardStats
+);
+
 router.post(
   "/list-candidate-per-polls-with-votes",
   globalRequestValidator(VALIDATORS.GlobalFilterSchema),

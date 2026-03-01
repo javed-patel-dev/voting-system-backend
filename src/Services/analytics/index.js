@@ -380,3 +380,50 @@ export const listCandidatesWithVoters = async (
 
   return { count, data };
 };
+
+export const getDashboardStats = async () => {
+  const [
+    totalVotersResult,
+    totalCandidatesResult,
+    totalPollsResult,
+    totalVotesResult,
+    activePollsResult,
+  ] = await Promise.all([
+    // Total Voters (users with role VOTER)
+    mongoose.connection.db
+      .collection("users")
+      .countDocuments({ role: "VOTER" }),
+
+    // Total Candidates
+    mongoose.connection.db.collection("candidates").countDocuments({}),
+
+    // Total Polls
+    mongoose.connection.db.collection("polls").countDocuments({}),
+
+    // Total Votes
+    mongoose.connection.db.collection("votes").countDocuments({}),
+
+    // Active Polls (current date between startDate and endDate)
+    mongoose.connection.db.collection("polls").countDocuments({
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    }),
+  ]);
+
+  // Get recent activity (votes in last 24 hours)
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const recentActivity = await mongoose.connection.db
+    .collection("votes")
+    .countDocuments({
+      createdAt: { $gte: twentyFourHoursAgo },
+    });
+
+  return {
+    totalVoters: totalVotersResult,
+    totalCandidates: totalCandidatesResult,
+    totalPolls: totalPollsResult,
+    activePolls: activePollsResult,
+    totalVotes: totalVotesResult,
+    recentActivity,
+  };
+};
