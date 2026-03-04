@@ -1,0 +1,186 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Congratulations - You Won! 🎉</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f7f8fa;
+        margin: 0;
+        padding: 0;
+        color: #333333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 40px auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        padding: 30px;
+      }
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 2px solid #f0f0f0;
+      }
+      .trophy {
+        font-size: 64px;
+        margin-bottom: 10px;
+      }
+      h1 {
+        font-size: 28px;
+        color: #2c3e50;
+        margin-bottom: 8px;
+      }
+      .subtitle {
+        font-size: 16px;
+        color: #7f8c8d;
+        margin: 0;
+      }
+      .content {
+        padding: 25px 0;
+      }
+      p {
+        font-size: 15px;
+        margin: 12px 0;
+        color: #555555;
+        line-height: 1.6;
+      }
+      .stats-box {
+        margin: 25px 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        color: white;
+      }
+      .stats-title {
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+      .stats-grid {
+        display: flex;
+        justify-content: space-between;
+        text-align: center;
+      }
+      .stat-item {
+        flex: 1;
+      }
+      .stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+      .stat-label {
+        font-size: 12px;
+        opacity: 0.8;
+        text-transform: uppercase;
+      }
+      .poll-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-left: 4px solid #667eea;
+      }
+      .poll-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 0 0 5px 0;
+      }
+      .poll-date {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin: 0;
+      }
+      .message-box {
+        background: #e8f5e9;
+        border-radius: 8px;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border: 1px solid #c8e6c9;
+      }
+      .message-box p {
+        margin: 0;
+        color: #2e7d32;
+        font-size: 14px;
+      }
+      .footer {
+        font-size: 13px;
+        color: #888888;
+        margin-top: 25px;
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+      }
+      .logo {
+        font-weight: bold;
+        color: #667eea;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="trophy">🏆</div>
+        <h1>Congratulations, {{name}}!</h1>
+        <p class="subtitle">You've won the election!</p>
+      </div>
+
+      <div class="content">
+        <p>
+          We're excited to announce that you have emerged victorious in the
+          poll. Your dedication and effort have paid off!
+        </p>
+
+        <div class="poll-info">
+          <p class="poll-title">{{pollTitle}}</p>
+          <p class="poll-date">Results declared on {{declaredAt}}</p>
+        </div>
+
+        <div class="stats-box">
+          <div class="stats-title">Your Results</div>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="text-align: center; padding: 10px;">
+                <div class="stat-value">{{voteCount}}</div>
+                <div class="stat-label">Votes Received</div>
+              </td>
+              <td style="text-align: center; padding: 10px;">
+                <div class="stat-value">{{totalVotes}}</div>
+                <div class="stat-label">Total Votes</div>
+              </td>
+              <td style="text-align: center; padding: 10px;">
+                <div class="stat-value">{{percentage}}%</div>
+                <div class="stat-label">Vote Share</div>
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="message-box">
+          <p>
+            ✅ Your victory is now official. You will be notified about the next
+            steps shortly.
+          </p>
+        </div>
+
+        <p>
+          Thank you for participating in the democratic process. We wish you all
+          the best in your new role!
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>
+          This is an automated message from
+          <span class="logo">VoteSecure</span>
+        </p>
+        <p>© 2026 Online Voting System. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

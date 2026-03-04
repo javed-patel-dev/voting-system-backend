@@ -8,40 +8,56 @@ import { routeGuard } from "../../../Middlewares/routeGuard.js";
 
 const router = Router();
 
+// Public: List polls with pagination
 router.post(
   "/list",
   globalRequestValidator(VALIDATORS.GlobalFilterSchema),
-  V1Controller.PollsController.list
+  V1Controller.PollsController.list,
 );
 
+// Protected: Get poll detail by ID
 router.get(
   "/:id",
   authGuard,
-  routeGuard(["VOTER", "ADMIN", "CANDIDATE"]),
-  V1Controller.PollsController.getDetailById
+  routeGuard(["VOTER", "ADMIN"]),
+  V1Controller.PollsController.getDetailById,
 );
 
+// Public: Get full poll details with candidates and results
+router.get("/:id/full", V1Controller.PollsController.getFullPollDetails);
+
+// Admin: Create a new poll
 router.post(
   "/",
   globalRequestValidator(VALIDATORS.CreatePollSchema),
   authGuard,
   routeGuard("ADMIN"),
-  V1Controller.PollsController.create
+  V1Controller.PollsController.create,
 );
 
-router.post(
+// Admin: Update a poll
+router.put(
   "/:id",
   globalRequestValidator(VALIDATORS.UpdatePollSchema),
   authGuard,
   routeGuard("ADMIN"),
-  V1Controller.PollsController.update
+  V1Controller.PollsController.update,
 );
 
+// Admin: Declare poll results
 router.post(
-  "/delete/:id",
+  "/:id/declare-results",
   authGuard,
   routeGuard("ADMIN"),
-  V1Controller.PollsController.destroy
+  V1Controller.PollsController.declareResults,
+);
+
+// Admin: Delete a poll
+router.delete(
+  "/:id",
+  authGuard,
+  routeGuard("ADMIN"),
+  V1Controller.PollsController.destroy,
 );
 
 export default router;

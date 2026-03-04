@@ -12,14 +12,22 @@ const candidateSchema = new mongoose.Schema(
       ref: "polls",
       required: true,
     },
+    manifesto: {
+      type: String,
+      required: true,
+      maxlength: 2000,
+    },
   },
   {
     timestamps: true, // adds createdAt, updatedAt
     versionKey: false, // removes __v
-  }
+  },
 );
 
-// Enforce 1 candidate per poll
-candidateSchema.index({ userId: 1 }, { unique: true });
+// Enforce: A user can only be a candidate ONCE per poll (but can be candidate in multiple polls)
+candidateSchema.index({ userId: 1, pollId: 1 }, { unique: true });
+
+// Index for fast lookup by pollId
+candidateSchema.index({ pollId: 1 });
 
 export const Candidate = mongoose.model("candidates", candidateSchema);

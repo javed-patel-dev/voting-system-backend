@@ -8,19 +8,32 @@ import { routeGuard } from "../../../Middlewares/routeGuard.js";
 
 const router = Router();
 
+// Protected: Cast a vote
 router.post(
   "/cast",
   globalRequestValidator(VALIDATORS.CreateVoteSchema),
   authGuard,
   routeGuard("VOTER"),
-  V1Controller.VotesController.create
+  V1Controller.VotesController.create,
 );
 
-router.post(
-  "/delete/:id",
+// Protected: Check if user has voted in a poll
+router.get(
+  "/status/:pollId",
   authGuard,
   routeGuard("VOTER"),
-  V1Controller.VotesController.destroy
+  V1Controller.VotesController.checkVoteStatus,
+);
+
+// Public: Get vote statistics for a poll (counts only, no voter details)
+router.get("/stats/:pollId", V1Controller.VotesController.getPollStats);
+
+// Admin: Delete a vote
+router.delete(
+  "/:id",
+  authGuard,
+  routeGuard("ADMIN"),
+  V1Controller.VotesController.destroy,
 );
 
 export default router;

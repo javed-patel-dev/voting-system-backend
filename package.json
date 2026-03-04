@@ -1,13 +1,14 @@
 {
   "name": "online-voting-system-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Online Voting System Backend - College Voting Platform",
   "type": "module",
   "main": "./index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/app.js",
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "seed:admin": "node src/scripts/seedAdmin.js"
   },
   "engines": {
     "node": ">=18.0.0"

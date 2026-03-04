@@ -8,31 +8,49 @@ import { routeGuard } from "../../../Middlewares/routeGuard.js";
 
 const router = Router();
 
+// List users (admin)
 router.post(
   "/list",
   globalRequestValidator(VALIDATORS.GlobalFilterSchema),
   authGuard,
-  V1Controller.UsersController.list
+  V1Controller.UsersController.list,
 );
 
+// Register new user
 router.post(
   "/register",
   globalRequestValidator(VALIDATORS.CreateUserSchema),
-  V1Controller.UsersController.create
+  V1Controller.UsersController.create,
 );
 
-router.post(
+// Get current user's profile
+router.get("/profile", authGuard, V1Controller.UsersController.getProfile);
+
+// Update current user's profile
+router.put("/profile", authGuard, V1Controller.UsersController.updateProfile);
+
+// Change password
+router.put(
+  "/change-password",
+  authGuard,
+  V1Controller.UsersController.changePassword,
+);
+
+// Update user by ID (admin)
+router.put(
   "/:id",
   globalRequestValidator(VALIDATORS.UpdateUserSchema),
   authGuard,
-  V1Controller.UsersController.update
+  routeGuard("ADMIN"),
+  V1Controller.UsersController.update,
 );
 
-router.post(
-  "/delete/:id",
+// Delete user (admin)
+router.delete(
+  "/:id",
   authGuard,
   routeGuard("ADMIN"),
-  V1Controller.UsersController.destroy
+  V1Controller.UsersController.destroy,
 );
 
 export default router;

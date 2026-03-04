@@ -32,7 +32,7 @@ export const list = async (req, res, next) => {
       sort,
       page,
       limit,
-      projection
+      projection,
     );
 
     return res.customResponse(
@@ -40,7 +40,7 @@ export const list = async (req, res, next) => {
       { data, total },
       true,
       req.requestId,
-      req.requestEpoch
+      req.requestEpoch,
     );
   } catch (error) {
     return next(
@@ -50,8 +50,8 @@ export const list = async (req, res, next) => {
         "TOASTER",
         req.requestId,
         req.requestEpoch,
-        error
-      )
+        error,
+      ),
     );
   }
 };
@@ -63,7 +63,7 @@ export const create = async (req, res, next) => {
     const { success } = await verifyOtp(
       get(body, "email"),
       "REGISTER",
-      get(body, "otp")
+      get(body, "otp"),
     );
 
     if (!success) {
@@ -73,8 +73,8 @@ export const create = async (req, res, next) => {
           "Session expired to create user. Please verify OTP again.",
           "TOASTER",
           req.requestId,
-          req.requestEpoch
-        )
+          req.requestEpoch,
+        ),
       );
     }
 
@@ -86,7 +86,7 @@ export const create = async (req, res, next) => {
       "User created successfully",
       true,
       req.requestId,
-      req.requestEpoch
+      req.requestEpoch,
     );
   } catch (error) {
     if (error.code === 11000) {
@@ -97,8 +97,8 @@ export const create = async (req, res, next) => {
           "TOASTER",
           req.requestId,
           req.requestEpoch,
-          error
-        )
+          error,
+        ),
       );
     }
 
@@ -109,8 +109,8 @@ export const create = async (req, res, next) => {
         "TOASTER",
         req.requestId,
         req.requestEpoch,
-        error
-      )
+        error,
+      ),
     );
   }
 };
@@ -129,7 +129,7 @@ export const update = async (req, res, next) => {
       ReasonPhrases.OK,
       true,
       req.requestId,
-      req.requestEpoch
+      req.requestEpoch,
     );
   } catch (error) {
     return next(
@@ -139,8 +139,8 @@ export const update = async (req, res, next) => {
         "TOASTER",
         req.requestId,
         req.requestEpoch,
-        error
-      )
+        error,
+      ),
     );
   }
 };
@@ -158,7 +158,7 @@ export const destroy = async (req, res, next) => {
       ReasonPhrases.OK,
       true,
       req.requestId,
-      req.requestEpoch
+      req.requestEpoch,
     );
   } catch (error) {
     return next(
@@ -168,8 +168,164 @@ export const destroy = async (req, res, next) => {
         "TOASTER",
         req.requestId,
         req.requestEpoch,
-        error
-      )
+        error,
+      ),
+    );
+  }
+};
+
+// Get current user's profile
+export const getProfile = async (req, res, next) => {
+  try {
+    const userId = get(req, "user._id");
+
+    const user = await UserService.findOne(
+      { _id: userId },
+      { password: 0 }, // Exclude password
+    );
+
+    if (!user) {
+      return next(
+        new CustomError(
+          StatusCodes.NOT_FOUND,
+          "User not found",
+          "TOASTER",
+          req.requestId,
+          req.requestEpoch,
+        ),
+      );
+    }
+
+    return res.customResponse(
+      StatusCodes.OK,
+      user,
+      true,
+      req.requestId,
+      req.requestEpoch,
+    );
+  } catch (error) {
+    return next(
+      new CustomError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
+        "TOASTER",
+        req.requestId,
+        req.requestEpoch,
+        error,
+      ),
+    );
+  }
+};
+
+// Update current user's profile
+export const updateProfile = async (req, res, next) => {
+  try {
+    const userId = get(req, "user._id");
+    const { name, bio, avatar } = req.body;
+
+    // Only allow updating certain fields
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (bio !== undefined) updateData.bio = bio;
+    if (avatar !== undefined) updateData.avatar = avatar;
+
+    const updatedUser = await UserService.updateOne(
+      { _id: userId },
+      updateData,
+      { new: true, select: "-password" },
+    );
+
+    if (!updatedUser) {
+      return next(
+        new CustomError(
+          StatusCodes.NOT_FOUND,
+          "User not found",
+          "TOASTER",
+          req.requestId,
+          req.requestEpoch,
+        ),
+      );
+    }
+
+    return res.customResponse(
+      StatusCodes.OK,
+      updatedUser,
+      true,
+      req.requestId,
+      req.requestEpoch,
+    );
+  } catch (error) {
+    return next(
+      new CustomError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
+        "TOASTER",
+        req.requestId,
+        req.requestEpoch,
+        error,
+      ),
+    );
+  }
+};
+
+// Change password
+export const changePassword = async (req, res, next) => {
+  try {
+    const userId = get(req, "user._id");
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await UserService.findOne({ _id: userId });
+
+    if (!user) {
+      return next(
+        new CustomError(
+          StatusCodes.NOT_FOUND,
+          "User not found",
+          "TOASTER",
+          req.requestId,
+          req.requestEpoch,
+        ),
+      );
+    }
+
+    // Verify current password
+    const isValidPassword = await encrypt.compare(
+      currentPassword,
+      user.password,
+    );
+    if (!isValidPassword) {
+      return next(
+        new CustomError(
+          StatusCodes.UNAUTHORIZED,
+          "Current password is incorrect",
+          "TOASTER",
+          req.requestId,
+          req.requestEpoch,
+        ),
+      );
+    }
+
+    // Hash and update new password
+    const hashedPassword = await encrypt.hash(newPassword);
+    await UserService.updateOne({ _id: userId }, { password: hashedPassword });
+
+    return res.customResponse(
+      StatusCodes.OK,
+      "Password changed successfully",
+      true,
+      req.requestId,
+      req.requestEpoch,
+    );
+  } catch (error) {
+    return next(
+      new CustomError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        error.message || ReasonPhrases.INTERNAL_SERVER_ERROR,
+        "TOASTER",
+        req.requestId,
+        req.requestEpoch,
+        error,
+      ),
     );
   }
 };

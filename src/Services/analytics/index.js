@@ -7,7 +7,7 @@ export const listPollWithCandidate = async (
   filter = {},
   sort = {},
   page = 1,
-  limit = 10
+  limit = 10,
 ) => {
   const skip = (page - 1) * limit;
 
@@ -207,7 +207,7 @@ export const listCandidatesWithVoters = async (
   filter = {},
   sort = {},
   page = 1,
-  limit = 10
+  limit = 10,
 ) => {
   const skip = (page - 1) * limit;
 
@@ -382,31 +382,45 @@ export const listCandidatesWithVoters = async (
 };
 
 export const getDashboardStats = async () => {
+  const now = new Date();
+
   const [
     totalVotersResult,
     totalCandidatesResult,
     totalPollsResult,
     totalVotesResult,
     activePollsResult,
+    upcomingPollsResult,
+    endedPollsResult,
   ] = await Promise.all([
-    // Total Voters (users with role VOTER)
+    // Total Voters (all users with role VOTER - these are potential voters)
     mongoose.connection.db
       .collection("users")
       .countDocuments({ role: "VOTER" }),
 
-    // Total Candidates
+    // Total Candidate registrations (across all polls)
     mongoose.connection.db.collection("candidates").countDocuments({}),
 
     // Total Polls
     mongoose.connection.db.collection("polls").countDocuments({}),
 
-    // Total Votes
+    // Total Votes cast
     mongoose.connection.db.collection("votes").countDocuments({}),
 
     // Active Polls (current date between startDate and endDate)
     mongoose.connection.db.collection("polls").countDocuments({
-      startDate: { $lte: new Date() },
-      endDate: { $gte: new Date() },
+      startDate: { $lte: now },
+      endDate: { $gte: now },
+    }),
+
+    // Upcoming Polls
+    mongoose.connection.db.collection("polls").countDocuments({
+      startDate: { $gt: now },
+    }),
+
+    // Ended Polls
+    mongoose.connection.db.collection("polls").countDocuments({
+      endDate: { $lt: now },
     }),
   ]);
 
@@ -418,12 +432,246 @@ export const getDashboardStats = async () => {
       createdAt: { $gte: twentyFourHoursAgo },
     });
 
+  // Get unique voters (users who have actually voted at least once)
+  const uniqueVotersResult = await Vote.aggregate([
+    { $group: { _id: "$voter" } },
+    { $count: "count" },
+  ]);
+  const uniqueVoters = uniqueVotersResult[0]?.count || 0;
+
+  // Get trending candidates (top 5 by votes)
+  const trendingCandidates = await Vote.aggregate([
+    {
+      $group: {
+        _id: "$candidateId",
+        voteCount: { $sum: 1 },
+      },
+    },
+    { $sort: { voteCount: -1 } },
+    { $limit: 5 },
+    {
+      $lookup: {
+        from: "candidates",
+        localField: "_id",
+        foreignField: "_id",
+        as: "candidate",
+      },
+    },
+    { $unwind: "$candidate" },
+    {
+      $lookup: {
+        from: "users",
+        localField: "candidate.userId",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: "$user" },
+    {
+      $lookup: {
+        from: "polls",
+        localField: "candidate.pollId",
+        foreignField: "_id",
+        as: "poll",
+      },
+    },
+    { $unwind: "$poll" },
+    {
+      $project: {
+        _id: 0,
+        candidateId: "$_id",
+        voteCount: 1,
+        user: {
+          _id: "$user._id",
+          name: "$user.name",
+          email: "$user.email",
+        },
+        poll: {
+          _id: "$poll._id",
+          title: "$poll.title",
+        },
+      },
+    },
+  ]);
+
+  // Get polls by activity (most votes)
+  const popularPolls = await Vote.aggregate([
+    {
+      $group: {
+        _id: "$pollId",
+        voteCount: { $sum: 1 },
+      },
+    },
+    { $sort: { voteCount: -1 } },
+    { $limit: 5 },
+    {
+      $lookup: {
+        from: "polls",
+        localField: "_id",
+        foreignField: "_id",
+        as: "poll",
+      },
+    },
+    { $unwind: "$poll" },
+    {
+      $project: {
+        _id: 0,
+        pollId: "$_id",
+        voteCount: 1,
+        title: "$poll.title",
+        startDate: "$poll.startDate",
+        endDate: "$poll.endDate",
+        status: "$poll.status",
+      },
+    },
+  ]);
+
   return {
     totalVoters: totalVotersResult,
+    uniqueVoters,
     totalCandidates: totalCandidatesResult,
     totalPolls: totalPollsResult,
     activePolls: activePollsResult,
+    upcomingPolls: upcomingPollsResult,
+    endedPolls: endedPollsResult,
     totalVotes: totalVotesResult,
     recentActivity,
+    trendingCandidates,
+    popularPolls,
   };
+};
+
+// Get detailed voter list per candidate for admin
+export const getVotersForCandidate = async (
+  pollId,
+  candidateId,
+  page = 1,
+  limit = 10,
+) => {
+  const skip = (page - 1) * limit;
+
+  const filter = { pollId: new mongoose.Types.ObjectId(pollId) };
+  if (candidateId) {
+    filter.candidateId = new mongoose.Types.ObjectId(candidateId);
+  }
+
+  const [voters, total] = await Promise.all([
+    Vote.find(filter)
+      .populate("voter", "name email avatar createdAt")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Vote.countDocuments(filter),
+  ]);
+
+  return { voters, total };
+};
+
+// Get voting timeline for a poll
+export const getVotingTimeline = async (pollId) => {
+  const votes = await Vote.aggregate([
+    { $match: { pollId: new mongoose.Types.ObjectId(pollId) } },
+    {
+      $group: {
+        _id: {
+          year: { $year: "$createdAt" },
+          month: { $month: "$createdAt" },
+          day: { $dayOfMonth: "$createdAt" },
+        },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
+    {
+      $project: {
+        _id: 0,
+        date: {
+          $dateFromParts: {
+            year: "$_id.year",
+            month: "$_id.month",
+            day: "$_id.day",
+          },
+        },
+        count: 1,
+      },
+    },
+  ]);
+
+  return votes;
+};
+
+// Get user voting history
+export const getUserVotingHistory = async (userId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const [votes, total] = await Promise.all([
+    Vote.find({ voter: new mongoose.Types.ObjectId(userId) })
+      .populate(
+        "pollId",
+        "title description startDate endDate status isResultDeclared",
+      )
+      .populate({
+        path: "candidateId",
+        populate: {
+          path: "userId",
+          select: "name email",
+        },
+      })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+    Vote.countDocuments({ voter: new mongoose.Types.ObjectId(userId) }),
+  ]);
+
+  return { votes, total };
+};
+
+// Get candidate registrations for a user
+export const getUserCandidateHistory = async (userId) => {
+  const candidates = await mongoose.connection.db
+    .collection("candidates")
+    .aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      {
+        $lookup: {
+          from: "polls",
+          localField: "pollId",
+          foreignField: "_id",
+          as: "poll",
+        },
+      },
+      { $unwind: "$poll" },
+      {
+        $lookup: {
+          from: "votes",
+          let: { candidateId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$candidateId", "$$candidateId"] } } },
+            { $count: "count" },
+          ],
+          as: "voteInfo",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          pollId: "$poll._id",
+          pollTitle: "$poll.title",
+          manifesto: 1,
+          voteCount: { $ifNull: [{ $arrayElemAt: ["$voteInfo.count", 0] }, 0] },
+          pollStatus: "$poll.status",
+          isResultDeclared: "$poll.isResultDeclared",
+          winnerId: "$poll.winnerId",
+          createdAt: 1,
+        },
+      },
+      { $sort: { createdAt: -1 } },
+    ])
+    .toArray();
+
+  // Mark if user was winner
+  return candidates.map((c) => ({
+    ...c,
+    isWinner: c.winnerId?.toString() === c._id.toString(),
+  }));
 };
